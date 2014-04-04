@@ -187,7 +187,7 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
       });
     }
   };
-  
+
   // This is called from the accordion-group directive to add itself to the accordion
   this.addGroup = function(groupScope) {
     var that = this;
@@ -240,7 +240,7 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
       accordionCtrl.addGroup(scope);
 
       scope.isOpen = false;
-      
+
       if ( attrs.isOpen ) {
         getIsOpen = $parse(attrs.isOpen);
         setIsOpen = getIsOpen.assign;
@@ -385,7 +385,7 @@ angular.module('ui.bootstrap.buttons', [])
       function getFalseValue() {
         return getCheckboxValue(attrs.btnCheckboxFalse, false);
       }
-      
+
       function getCheckboxValue(attributeValue, defaultValue) {
         var val = scope.$eval(attributeValue);
         return angular.isDefined(val) ? val : defaultValue;
@@ -1326,7 +1326,13 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
 
 angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['$document', '$location', function ($document, $location) {
   var openElement = null,
-      closeMenu   = angular.noop;
+      closeMenu   = angular.noop,
+      key = {
+        UP: 38,
+        DOWN: 40,
+        ESC: 27,
+        ENTER: 13
+      };
   return {
     restrict: 'CA',
     link: function(scope, element, attrs) {
@@ -1346,17 +1352,88 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
         if (!elementWasOpen && !element.hasClass('disabled') && !element.prop('disabled')) {
           element.parent().addClass('open');
           openElement = element;
+          // returns the first menu item and stops traversing the rest of the dom
+          var menu = element.parent().find('[role="menu"]:first'),
+              menuItems = menu.find('li:visible a');
+          keyboardNavigation = function (event) {
+            event.stopImmediatePropagation();
+            switch (event.which) {
+              case key.ESC:
+                closeMenu();
+                break;
+              case key.UP:
+                focusOnArrow(event);
+                break;
+              case key.DOWN:
+                focusOnArrow(event);
+                break;
+              case key.ENTER:
+                doSelect(event);
+                break;
+            }
+          };
+          focusOnArrow = function (event) {
+            if (!menuItems.length) {
+              // If there are no children, return gracefully
+              return;
+            }
+
+            var index = menuItems.index(menuItems.filter('.selected')),
+                prevIndex = 0;
+            // up arrow key pressed, move focus up one item
+            if (event.which === key.UP && index > 0) {
+              prevIndex = index;
+              index -= 1;
+            }
+            // down arrow key pressed, move focus down one item
+            if (event.which === key.DOWN && index < menuItems.length - 1) {
+              prevIndex = index;
+              index += 1;
+            }
+            // index is -1, set it to 0
+            if (!~index) {
+              index = 0;
+            }
+            menuItems.eq(prevIndex).removeClass('selected');
+            menuItems.eq(index).addClass('selected');
+          };
+          doSelect = function (event) {
+            event.stopImmediatePropagation();
+            var selectedItem = menuItems.filter('.selected');
+            if (selectedItem.length >= 1) {
+              scope.$emit('ui-bootstrap.dropdownItemSelected', {event:event, item:selectedItem[0]});
+            } else {
+              scope.$emit('ui-bootstrap.dropdownInputSelected', {event:event, target:event.target, value:event.target.value});
+            }
+          };
           closeMenu = function (event) {
             if (event) {
               event.preventDefault();
               event.stopPropagation();
             }
             $document.unbind('click', closeMenu);
+            $document.unbind('keyup', keyboardNavigation);
+            element.unbind('input');
+            menu.unbind('mouseover');
             element.parent().removeClass('open');
+            element.parent().find('[role="menu"] li:visible a.selected').removeClass('selected');
             closeMenu = angular.noop;
             openElement = null;
           };
+          escapeKeyBind = function (event) {
+            if (event.which === key.ESC) {
+              closeMenu();
+            }
+          };
+
           $document.bind('click', closeMenu);
+          $document.bind('keyup', keyboardNavigation);
+          menu.bind('mouseover', function() {
+            menuItems.filter('.selected').removeClass('selected');
+          });
+          element.bind('input', function() {
+            menuItems.filter('.selected').removeClass('selected');
+          });
         }
       });
     }
@@ -1586,7 +1663,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           backdropDomEl = $compile('<div modal-backdrop></div>')(backdropScope);
           body.append(backdropDomEl);
         }
-          
+
         var angularDomEl = angular.element('<div modal-window></div>');
         angularDomEl.attr('window-class', modal.windowClass);
         angularDomEl.attr('index', openedWindows.length() - 1);
@@ -2008,7 +2085,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
   // The options specified to the provider globally.
   var globalOptions = {};
-  
+
   /**
    * `options({})` allows global configuration of all tooltips in the
    * application.
@@ -2077,7 +2154,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
       var startSym = $interpolate.startSymbol();
       var endSym = $interpolate.endSymbol();
-      var template = 
+      var template =
         '<div '+ directiveName +'-popup '+
           'title="'+startSym+'tt_title'+endSym+'" '+
           'content="'+startSym+'tt_content'+endSym+'" '+
@@ -2202,7 +2279,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
               // Set the initial positioning.
               tooltip.css({ top: 0, left: 0, display: 'block' });
 
-              // Now we add it to the DOM because need some info about it. But it's not 
+              // Now we add it to the DOM because need some info about it. But it's not
               // visible yet anyway.
               if ( appendToBody ) {
                   $document.find( 'body' ).append( tooltip );
@@ -2229,7 +2306,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
               //if tooltip is going to be shown after delay, we must cancel this
               $timeout.cancel( popupTimeout );
 
-              // And now we remove it from the DOM. However, if we have animation, we 
+              // And now we remove it from the DOM. However, if we have animation, we
               // need to wait for it to expire beforehand.
               // FIXME: this is a placeholder for a port of the transitions library.
               if ( scope.tt_animation ) {
@@ -3219,7 +3296,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //we need to propagate user's query so we can higlight matches
       scope.query = undefined;
 
-      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later 
+      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later
       var timeoutPromise;
 
       //plug into $parsers pipeline to open a typeahead on view changes initiated from DOM
