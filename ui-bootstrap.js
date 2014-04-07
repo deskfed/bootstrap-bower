@@ -1340,7 +1340,9 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
       element.parent().bind('click', function() { closeMenu(); });
       element.bind('click', function (event) {
 
-        var elementWasOpen = (element === openElement);
+        var elementWasOpen = (element === openElement),
+            menu = element.parent().find('[role="menu"]:first'),
+            menuItems, selectedItem;
 
         event.preventDefault();
         event.stopPropagation();
@@ -1352,10 +1354,9 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
         if (!elementWasOpen && !element.hasClass('disabled') && !element.prop('disabled')) {
           element.parent().addClass('open');
           openElement = element;
+          menuItems = menu.find('li:visible a')
           // returns the first menu item and stops traversing the rest of the dom
-          var menu = element.parent().find('[role="menu"]:first'),
-              menuItems = menu.find('li:visible a');
-          keyboardNavigation = function (event) {
+          function keyboardNavigation(event) {
             event.stopImmediatePropagation();
             switch (event.which) {
               case key.ESC:
@@ -1372,7 +1373,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
                 break;
             }
           };
-          focusOnArrow = function (event) {
+          function focusOnArrow(event) {
             if (!menuItems.length) {
               // If there are no children, return gracefully
               return;
@@ -1397,16 +1398,16 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
             menuItems.eq(prevIndex).removeClass('selected');
             menuItems.eq(index).addClass('selected');
           };
-          doSelect = function (event) {
+          function doSelect(event) {
             event.stopImmediatePropagation();
-            var selectedItem = menuItems.filter('.selected');
+            selectedItem = menuItems.filter('.selected');
             if (selectedItem.length >= 1) {
               scope.$emit('ui-bootstrap.dropdownItemSelected', {event:event, item:selectedItem[0]});
             } else {
               scope.$emit('ui-bootstrap.dropdownInputSelected', {event:event, target:event.target, value:event.target.value});
             }
           };
-          closeMenu = function (event) {
+          function closeMenu(event) {
             if (event) {
               event.preventDefault();
               event.stopPropagation();
@@ -1418,9 +1419,9 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
             element.parent().removeClass('open');
             element.parent().find('[role="menu"] li:visible a.selected').removeClass('selected');
             closeMenu = angular.noop;
-            openElement = null;
+            openElement = menu = menuItems = selectedItem = null;
           };
-          escapeKeyBind = function (event) {
+          function escapeKeyBind(event) {
             if (event.which === key.ESC) {
               closeMenu();
             }
@@ -2095,9 +2096,9 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
    *     $tooltipProvider.options( { placement: 'left' } );
    *   });
    */
-	this.options = function( value ) {
-		angular.extend( globalOptions, value );
-	};
+  this.options = function( value ) {
+    angular.extend( globalOptions, value );
+  };
 
   /**
    * This allows you to extend the set of trigger mappings available. E.g.:
