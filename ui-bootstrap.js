@@ -2246,6 +2246,12 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
                     left: position.left + position.width * 2 - position.width / 2 - ttWidth
                   };
                   break;
+                case 'custom':
+                  ttPosition = {
+                    top: position.top + custTop,
+                    left: position.left + custLeft
+                  };
+                  break;                
                 default:
                   ttPosition = {
                     top: position.top - ttHeight,
