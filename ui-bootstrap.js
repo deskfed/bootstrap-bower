@@ -1364,9 +1364,11 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
                 break;
               case key.UP:
                 focusOnArrow(event);
+                event.preventDefault();
                 break;
               case key.DOWN:
                 focusOnArrow(event);
+                event.preventDefault();
                 break;
               case key.ENTER:
                 doSelect(event);
@@ -1413,7 +1415,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
               event.stopPropagation();
             }
             $document.unbind('click', closeMenu);
-            $document.unbind('keyup', keyboardNavigation);
+            $document.unbind('keydown', keyboardNavigation);
             element.unbind('input');
             menu.unbind('mouseover');
             element.parent().removeClass('open');
@@ -1428,7 +1430,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
           };
 
           $document.bind('click', closeMenu);
-          $document.bind('keyup', keyboardNavigation);
+          $document.bind('keydown', keyboardNavigation);
           menu.bind('mouseover', function() {
             menuItems.filter('.selected').removeClass('selected');
           });
@@ -2179,6 +2181,8 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             var triggers = getTriggers( undefined );
             var hasRegisteredTriggers = false;
             var hasEnableExp = angular.isDefined(attrs[prefix+'Enable']);
+            var custTop = parseInt(attrs.custTop,10) || 0;
+            var custLeft = parseInt(attrs.custLeft,10) || 0;
 
             var positionTooltip = function (){
               var position,
