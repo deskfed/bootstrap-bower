@@ -1354,7 +1354,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
         if (!elementWasOpen && !element.hasClass('disabled') && !element.prop('disabled')) {
           element.parent().addClass('open');
           openElement = element;
-          menuItems = menu.find('li:visible a')
+          if (menu) menuItems = menu.find('li:visible a');
           // returns the first menu item and stops traversing the rest of the dom
           function keyboardNavigation(event) {
             event.stopImmediatePropagation();
