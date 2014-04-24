@@ -1419,7 +1419,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
             element.unbind('input');
             menu.unbind('mouseover');
             element.parent().removeClass('open');
-            element.parent().find('[role="menu"] li:visible a.selected').removeClass('selected');
+            element.parent().find('[role="menu"] li a.selected').removeClass('selected');
             closeMenu = angular.noop;
             openElement = menu = menuItems = selectedItem = null;
           };
@@ -2255,7 +2255,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
                     top: position.top + custTop,
                     left: position.left + custLeft
                   };
-                  break;                
+                  break;
                 default:
                   ttPosition = {
                     top: position.top - ttHeight,
