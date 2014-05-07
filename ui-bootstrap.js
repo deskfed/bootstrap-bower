@@ -1408,6 +1408,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
             } else {
               scope.$emit('ui-bootstrap.dropdownInputSelected', {event:event, target:event.target, value:event.target.value});
             }
+            closeMenu();
           };
           function closeMenu(event) {
             if (event) {
@@ -1421,7 +1422,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
             element.parent().removeClass('open');
             element.parent().find('[role="menu"] li a.selected').removeClass('selected');
             closeMenu = angular.noop;
-            openElement = menu = menuItems = selectedItem = null;
+            [openElement, menu, menuItems, selectedItem] === null;
           };
           function escapeKeyBind(event) {
             if (event.which === key.ESC) {
