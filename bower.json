@@ -3,7 +3,7 @@
         "name": "https://github.com/deskfed/bootstrap/graphs/contributors"
     },
     "name": "angular-bootstrap",
-    "version": "0.10.0-patch2",
+    "version": "0.10.0-patch3",
     "main": ["./ui-bootstrap.js"],
     "dependencies": {
         "angular": ">=1"
