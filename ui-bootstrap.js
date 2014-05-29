@@ -2204,6 +2204,45 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
                   lhs = -4; //0 - half the width of the tooltip arrow
                 }
                 return lhs;
+              };
+
+              // Determine if the popover bleeds off the bottom edge of the screen
+              var croppedBottom = function() {
+                return ((position.top+position.height+ttHeight) > this.innerHeight);
+              };
+
+              // Determine if the popover bleeds off the top edge of the screen
+              var croppedTop = function() {
+                return ((position.top-ttHeight) < 0);
+              };
+
+              // Determine if the popover bleeds off the left edge of the screen
+              var croppedLeft = function() {
+                return ((position.left-ttWidth) < 0);
+              };
+
+              // Determine if the popover bleeds off the right edge of the screen
+              var croppedRight = function() {
+                return ((position.left+position.width+ttWidth) > this.innerWidth);
+              };
+
+              // Determine if we need to fall back to a different position
+              // if there's not enough room.
+              if (attrs.popoverFallback) {
+                if ((croppedTop() && ((['left','right'].indexOf(attrs.popoverPlacement) > -1) ||
+                  attrs.popoverPlacement.match(/top/))) ||
+                  (croppedBottom() && ((['left','right'].indexOf(attrs.popoverPlacement) > -1) ||
+                  attrs.popoverPlacement.match(/bottom/))) ||
+                  (croppedLeft() && ((['top','bottom'].indexOf(attrs.popoverPlacement) > -1) ||
+                  attrs.popoverPlacement.match(/left/))) ||
+                  (croppedRight() && ((['top','bottom'].indexOf(attrs.popoverPlacement) > -1) ||
+                  attrs.popoverPlacement.match(/right/)))) {
+                  scope.tt_placement = attrs.popoverFallback;
+                }
+                else {
+                  // Restore the original value (in case tt_placement was modified)
+                  scope.tt_placement = attrs.popoverPlacement;
+                }
               }
 
               // Calculate the tooltip's top and left coordinates to center it with
