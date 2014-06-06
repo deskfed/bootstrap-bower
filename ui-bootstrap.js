@@ -2184,6 +2184,8 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             var hasEnableExp = angular.isDefined(attrs[prefix+'Enable']);
             var custTop = parseInt(attrs.custTop,10) || 0;
             var custLeft = parseInt(attrs.custLeft,10) || 0;
+            var createChildScope = !!scope.tt_childScope;
+            var childScope = null;
 
             var positionTooltip = function (){
               var position,
@@ -2401,11 +2403,15 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             }
 
             function createTooltip() {
+              var linkScope = scope;
               // There can only be one tooltip element per directive shown at once.
               if (tooltip) {
                 removeTooltip();
               }
-              tooltip = tooltipLinker(scope, function () {});
+              if (createChildScope) {
+                childScope = linkScope = scope.$new();
+              }
+              tooltip = tooltipLinker(linkScope, function () {});
 
               // Get contents rendered into the tooltip
               scope.$digest();
@@ -2413,6 +2419,10 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
             function removeTooltip() {
               if (tooltip) {
+                if (createChildScope) {
+                  childScope.$destroy();
+                  childScope = null
+                }
                 tooltip.remove();
                 tooltip = null;
               }
