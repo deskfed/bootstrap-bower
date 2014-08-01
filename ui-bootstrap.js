@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.11.1 - 2014-07-28
+ * Version: 0.11.2 - 2014-08-01
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -1736,6 +1736,8 @@ angular.module('ui.bootstrap.dropdown', [])
 
   $scope.$on('$destroy', function() {
     scope.$destroy();
+    scope.focusToggleElement = angular.noop;
+    self.toggleElement = self.$element = null;
   });
 }])
 
@@ -3635,7 +3637,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //we need to propagate user's query so we can higlight matches
       scope.query = undefined;
 
-      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later
+      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later 
       var timeoutPromise;
 
       //plug into $parsers pipeline to open a typeahead on view changes initiated from DOM
