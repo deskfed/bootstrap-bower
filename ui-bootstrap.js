@@ -1587,8 +1587,11 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         openedWindows.remove(modalInstance);
 
         //remove window DOM element
-        removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, checkRemoveBackdrop);
-        body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
+        removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
+          modalWindow.modalScope.$destroy();
+          body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
+          checkRemoveBackdrop();
+        });
       }
 
       function checkRemoveBackdrop() {
