@@ -2023,7 +2023,6 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           backdropDomEl = $compile('<div modal-backdrop></div>')(backdropScope);
           backdropDomEl.attr('backdrop-class', modal.backdropClass);
           backdropDomEl.addClass(modal.backdropClass);
-          backdropDomEl = $compile('<div modal-backdrop></div>')(backdropScope);
           body.append(backdropDomEl);
         }
 
