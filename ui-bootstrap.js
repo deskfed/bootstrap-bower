@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.11.5 - 2014-08-20
+ * Version: 0.11.6 - 2014-08-20
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -2722,7 +2722,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             // by the change.
             if ( appendToBody ) {
               scope.$on('$locationChangeSuccess', function closeTooltipOnLocationChangeSuccess () {
-              if ( scope.tt_isOpen && !scope.persist ) {
+              if ( scope.tt_isOpen && !scope.tt_persist ) {
                 hide();
               }
             });
