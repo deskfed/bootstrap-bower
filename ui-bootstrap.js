@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.11.6 - 2014-08-20
+ * Version: 0.11.7 - 2015-02-20
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -1897,7 +1897,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           if (modal && modal.value.backdrop && modal.value.backdrop != 'static' && (evt.target === evt.currentTarget)) {
             evt.preventDefault();
             evt.stopPropagation();
-            $modalStack.dismiss(modal.key, 'backdrop click');
+            $modalStack.dismiss(modal.key, 'backdrop click', modal.value);
           }
         };
       }
@@ -1930,7 +1930,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         }
       });
 
-      function removeModalWindow(modalInstance) {
+      function removeModalWindow(modalInstance, modalOptions) {
 
         var body = $document.find('body').eq(0);
         var modalWindow = openedWindows.get(modalInstance).value;
@@ -1939,7 +1939,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         openedWindows.remove(modalInstance);
 
         //remove window DOM element
-        removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
+        removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, modalOptions.removeDelay, function() {
           modalWindow.modalScope.$destroy();
           body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
           checkRemoveBackdrop();
@@ -1999,7 +1999,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           if (modal && modal.value.keyboard) {
             evt.preventDefault();
             $rootScope.$apply(function () {
-              $modalStack.dismiss(modal.key, 'escape key press');
+              $modalStack.dismiss(modal.key, 'escape key press', modal.value);
             });
           }
         }
@@ -2012,7 +2012,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           modalScope: modal.scope,
           backdrop: modal.backdrop,
           backdropClass: modal.backdropClass,
-          keyboard: modal.keyboard
+          keyboard: modal.keyboard,
+          removeDelay: modal.removeDelay
         });
 
         var body = $document.find('body').eq(0),
@@ -2043,26 +2044,26 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         body.addClass(OPENED_MODAL_CLASS);
       };
 
-      $modalStack.close = function (modalInstance, result) {
+      $modalStack.close = function (modalInstance, result, modalOptions) {
         var modalWindow = openedWindows.get(modalInstance).value;
         if (modalWindow) {
           modalWindow.deferred.resolve(result);
-          removeModalWindow(modalInstance);
+          removeModalWindow(modalInstance, modalOptions);
         }
       };
 
-      $modalStack.dismiss = function (modalInstance, reason) {
+      $modalStack.dismiss = function (modalInstance, reason, modalOptions) {
         var modalWindow = openedWindows.get(modalInstance).value;
         if (modalWindow) {
           modalWindow.deferred.reject(reason);
-          removeModalWindow(modalInstance);
+          removeModalWindow(modalInstance, modalOptions);
         }
       };
 
       $modalStack.dismissAll = function (reason) {
         var topModal = this.getTop();
         while (topModal) {
-          this.dismiss(topModal.key, reason);
+          this.dismiss(topModal.key, reason, topModal.value);
           topModal = this.getTop();
         }
       };
@@ -2113,16 +2114,17 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
               result: modalResultDeferred.promise,
               opened: modalOpenedDeferred.promise,
               close: function (result) {
-                $modalStack.close(modalInstance, result);
+                $modalStack.close(modalInstance, result, modalOptions);
               },
               dismiss: function (reason) {
-                $modalStack.dismiss(modalInstance, reason);
+                $modalStack.dismiss(modalInstance, reason, modalOptions);
               }
             };
 
             //merge and clean up options
             modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
             modalOptions.resolve = modalOptions.resolve || {};
+            modalOptions.removeDelay = !isNaN(modalOptions.removeDelay) ? modalOptions.removeDelay : 300;
 
             //verify options
             if (!modalOptions.template && !modalOptions.templateUrl) {
@@ -2162,7 +2164,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                 keyboard: modalOptions.keyboard,
                 windowClass: modalOptions.windowClass,
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
-                size: modalOptions.size
+                size: modalOptions.size,
+                removeDelay: modalOptions.removeDelay
               });
 
             }, function resolveError(reason) {
@@ -3654,7 +3657,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //we need to propagate user's query so we can higlight matches
       scope.query = undefined;
 
-      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later
+      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later 
       var timeoutPromise;
 
       //plug into $parsers pipeline to open a typeahead on view changes initiated from DOM
