@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.13.3 - 2015-02-20
+ * Version: 0.13.4 - 2015-03-18
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -2601,6 +2601,11 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             // TODO add ability to start tooltip opened
             ttScope.isOpen = false;
 
+            // Wire up toggle/open/close
+            ttScope.toggleTooltip = toggleTooltipBind;
+            ttScope.hideTooltip = hideTooltipBind;
+            ttScope.showTooltip = showTooltipBind;
+
             function toggleTooltipBind () {
               if ( ! ttScope.isOpen ) {
                 showTooltipBind();
@@ -2630,9 +2635,14 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             }
 
             function hideTooltipBind () {
-              scope.$apply(function () {
+              // We can now call this function from outside, so need to check for current digest cycle.
+              if (!scope.$$phase) {
+                scope.$apply(function () {
+                  hide();
+                });
+              } else {
                 hide();
-              });
+              }
             }
 
             // Show the tooltip popup element.
@@ -2669,8 +2679,10 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
 
               // And show the tooltip.
               ttScope.isOpen = true;
-              ttScope.$digest(); // digest required as $apply is not called
-
+              // We can now call this function from outside, so need to check for current digest cycle.
+              if (!scope.$$phase) {
+                ttScope.$digest(); // digest required as $apply is not called
+              }
               // Return positioning function as promise callback for correct
               // positioning after draw.
               return positionTooltip;
