@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.13.8 - 2015-03-26
+ * Version: 0.13.9 - 2015-04-14
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -975,13 +975,14 @@ angular.module('ui.bootstrap.position', [])
             case 'bottom':
               targetElPos = {
                 top: shiftHeight[pos0]() + off1,
-                left: shiftWidth[pos1]() + off0
+                // Ensure that the element never bleeds off the right edge
+                left: Math.min(shiftWidth[pos1]() + off0,$window.innerWidth - targetElWidth)
               };
               break;
             default:
               targetElPos = {
                 top: hostElPos.top - targetElHeight + off1,
-                left: shiftWidth[pos1]() + off0
+                left: Math.min(shiftWidth[pos1]() + off0,$window.innerWidth - targetElWidth)
               };
               break;
           }
@@ -994,7 +995,7 @@ angular.module('ui.bootstrap.position', [])
               // If we are positioning at the top
               (positionStr.match(/top/) || !positionStr /* 'top' is default */)
             ) || (
-              // BOTOM
+              // BOTTOM
               ((hostElPos.top + hostElPos.height + targetElHeight) > $window.innerHeight) &&
               positionStr.match(/bottom/)
             ) || (
