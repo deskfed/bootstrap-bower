@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://deskfed.github.io/bootstrap/
 
- * Version: 0.13.10 - 2015-07-27
+ * Version: 0.13.11 - 2016-02-08
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -991,25 +991,27 @@ angular.module('ui.bootstrap.position', [])
             // TOP
             (
               // Popover it outside the top of the containing element
-              ((hostElPos.top - targetElHeight) < 0) &&
+              (targetElPos.top - targetElHeight < 0) &&
               // If we are positioning at the top
               (positionStr.match(/top/) || !positionStr /* 'top' is default */)
             ) || (
               // BOTTOM
-              ((hostElPos.top + hostElPos.height + targetElHeight) > $window.innerHeight) &&
+              (targetElPos.top + targetElHeight > $window.innerHeight) &&
               positionStr.match(/bottom/)
             ) || (
               // LEFT
-              ((hostElPos.left - targetElWidth) < 0) &&
+              (targetElPos.left - targetElWidth < 0) &&
               positionStr.match(/left/)
             ) || (
               // RIGHT
-              ((hostElPos.left + hostElPos.width + targetElWidth) > $window.innerWidth) &&
+              ((targetElPos.left + targetElWidth) > $window.innerWidth) &&
               positionStr.match(/right/)
             )
           )) {
             return doPositioning.call(this, hostEl, targetEl, positionFallbackStr, appendToBody);
           }
+          // Pass this on so we can set the class later.
+          targetElPos.placement = positionStr;
           return targetElPos;
         }
 
@@ -2588,7 +2590,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
             var triggers = getTriggers( undefined );
             var hasEnableExp = angular.isDefined(attrs[prefix+'Enable']);
             var ttScope = scope.$new();
-            
+
             var popoverOpen = attrs[prefix+'Open'];
             var popoverAnimation = attrs[prefix+'Animation'];
 
@@ -2597,6 +2599,10 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
               var ttPosition = $position.positionElements(element, tooltip, ttScope.placement, appendToBody, ttScope.placementFallback);
               ttPosition.top += 'px';
               ttPosition.left += 'px';
+              // Set a boolean to tell us whether the fallback position was used
+              // so we can set the class name on the element appropriately.
+              ttScope.fallbackUsed = ttPosition.placement === ttScope.placementFallback;
+              ttPosition.placement = undefined;
 
               // Now set the calculated positioning.
               tooltip.css( ttPosition );
